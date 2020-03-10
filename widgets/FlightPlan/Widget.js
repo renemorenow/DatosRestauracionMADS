@@ -305,14 +305,24 @@ define([
                     }
                     widgetFlightPlan.storeAircrafts = new Memory({ data: arrayCboAircrafts });
 
-                    widgetFlightPlan.aircraftsSelect = new FilteringSelect({
+                    // widgetFlightPlan.aircraftsSelect = new FilteringSelect({
+                    //     id: "aircraftsSelect",
+                    //     name: "aircrafts",
+                    //     value: "",
+                    //     required: false,
+                    //     store: widgetFlightPlan.storeAircrafts,
+                    //     searchAttr: "name",
+                    //     style: "width:150px !important;",
+                    // }, "aircraftsSelect").startup();
+                    // aircraftsSelect.autocomplete = "on";
+                    // aircraftsSelect.defaultValue = "Seleccione una opción";
+
+                    widgetFlightPlan.filteringSelect = new FilteringSelect({
                         id: "aircraftsSelect",
                         name: "aircrafts",
                         value: "",
-                        required: false,
                         store: widgetFlightPlan.storeAircrafts,
-                        searchAttr: "name",
-                        style: "width:150px !important;",
+                        searchAttr: "name"
                     }, "aircraftsSelect").startup();
                     aircraftsSelect.autocomplete = "on";
                     aircraftsSelect.defaultValue = "Seleccione una opción";
@@ -606,7 +616,9 @@ define([
             applyEditProject: function() {
                 debugger;
                 var f = dojo.byId("frmMissionPlanning");
-                var aircraftsSelect = dojo.byId('aircraftsSelect');
+                var eew = dijit.byId('aircrafts').get('value');
+                var aircraftsSelect = dojo.byId('aircrafts');
+                var aircraftsSelect2 = dijit.byId('aircraftsSelect').attr('value');
                 var strUser = aircraftsSelect.options[aircraftsSelect.selectedIndex].value;
                 var attributesFeature = {};
                 attributesFeature.name = dojo.byId("txtFlightPlanName").value;
