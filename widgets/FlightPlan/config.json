@@ -1,0 +1,7 @@
+{
+  "configText": "abcdefg",
+  "urlAircraftsService": "https://services1.arcgis.com/7S16A7PAFcmSmqJA/ArcGIS/rest/services/FAC_PlayBack/FeatureServer/2",
+  "urlFlightPlansService_OLD": "https://services1.arcgis.com/7S16A7PAFcmSmqJA/ArcGIS/rest/services/FAC_PlayBack/FeatureServer/4",
+  "urlFlightPlansService": "https://services6.arcgis.com/hxAwRYAu9QHliJ8T/arcgis/rest/services/GBD_RESTAURACION/FeatureServer/2",
+  "urlAirportsGisService": "https://services1.arcgis.com/7S16A7PAFcmSmqJA/arcgis/rest/services/FAC_GIS_AERODROMOS_OPERACION/FeatureServer/0"
+}

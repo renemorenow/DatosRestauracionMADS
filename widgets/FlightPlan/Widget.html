@@ -1,0 +1,116 @@
+<div data-dojo-attach-point="flightplancontainer">
+    <div id="divGridFlightPlans">
+        <table style="border: 0px; width:100%" cellspacing="10">
+            <tr>
+                <td>
+                    <div id="divFlightPlanList" data-dojo-attach-point="listFlightPlanList">
+                        <table style="width:100%">
+                            <tr>
+                                <td style="width:100%; text-align:right;" align="right">
+                                    <div role="button" tabindex="0" title="${nls.CreateFlightPlan}" class="jimu-btn" data-dojo-attach-point="btnAddFlightPlan" data-dojo-attach-event="onclick:createFlightPlan">
+                                        ${nls.CreateFlightPlan}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:right;width:97%; height:auto; text-align:center;">
+                                    <div id="gridFlightPlans"></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>    
+    <div id="divCreateFlightPlan" data-dojo-type="dijit/layout/ContentPane" title=${nls.TitleMissionCreation}
+            data-dojo-props="selected:true" style="width:Select 100%;">
+        <form id="frmMissionPlanning">
+            <table style="border: 0px; width:100%" cellspacing="10">
+                <tr>
+                    <td align="right">
+                        <label for="lblFlightPlanName">${nls.FlightPlanName}:</label><span class="atiRequiredField"> *</span>
+                    </td>
+                    <td>
+                        <input data-dojo-attach-point="txtFlightPlanName" data-dojo-type="dijit/form/TextBox" name="txtFlightPlanName" id="txtFlightPlanName" required="true" />
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">
+                        <label for="lblProjectType">${nls.ProjectType}:</label><span class="atiRequiredField"> *</span>
+                    </td>
+                    <td>
+                        <select id="aircraftsSelect" name="aircraftsSelect" required="true" />
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">
+                        <label for="lblFinancialEntity">${nls.FinancialEntity}:</label>
+                    </td>
+                    <td>
+                        <input data-dojo-attach-point="txtFinancialEntity" data-dojo-type="dijit/form/TextBox" name="txtFinancialEntity" id="txtFinancialEntity" />
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">
+                        <label for="lblExecuteEntity">${nls.ExecuteEntity}:</label>
+                    </td>
+                    <td>
+                        <input data-dojo-attach-point="txtExecuteEntity" data-dojo-type="dijit/form/TextBox" name="txtExecut-eEntity" id="txtExecuteEntity" />
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">
+                        <label for="lblEstablishmentDate">${nls.EstablishmentDate}:</label><span class="atiRequiredField"> *</span>
+                    </td>
+                    <td>
+                        <input data-dojo-id="txtEstablishmentDate" type="text" data-dojo-type="dijit/form/DateTextBox" required="true" data-dojo-attach-point="txtEstablishmentDate" name="txtEstablishmentDate" id="txtEstablishmentDate" required="true" onChange="myToDate.constraints.min = arguments[0];" />
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">
+                        <label for="lblLeadTime">${nls.LeadTime}:</label><span class="atiRequiredField"> *</span>
+                    </td>
+                    <td>
+                        <input data-dojo-attach-point="txtLeadTime" data-dojo-type="dijit/form/TextBox" name="txtExecut-eEntity" id="txtLeadTime" required="true"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">
+                        <label for="lblProjectValue">${nls.ProjectValue}:</label>
+                    </td>
+                    <td>
+                        <input data-dojo-attach-point="txtProjectValue" data-dojo-type="dijit/form/TextBox" name="txtExecut-eEntity" id="txtProjectValue" />
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">
+                        <label for="lblComment">${nls.Comment}:</label>
+                    </td>
+                    <td>
+                        <input data-dojo-attach-point="txtComment" data-dojo-type="dijit/form/TextBox" name="txtExecut-eEntity" id="txtComment" />
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">
+                        <label for="lblBudgetCode">${nls.BudgetCode}:</label>
+                    </td>
+                    <td>
+                        <input data-dojo-attach-point="txtBudgetCode" data-dojo-type="dijit/form/TextBox" name="txtExecut-eEntity" id="txtBudgetCode" />
+                    </td>
+                </tr>
+            </table>
+            <div id="divResult"></div>
+        </form>
+    </div>
+    <div id="divButtonsCreateFlightPlan" style="width: 100%; height: 50px; text-align:center">
+        <div role="submit" tabindex="0" title="${nls.Save}" class="jimu-btn" data-dojo-attach-point="btnSave" data-dojo-attach-event="onclick:applyEditProject">
+            ${nls.Save}
+        </div>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <div role="button" tabindex="1" title="${nls.Cancel}" class="jimu-btn" data-dojo-attach-point="btnCancel" data-dojo-attach-event="onclick:cancelCreateFlightPlan">
+            ${nls.Cancel}
+        </div>
+    </div>
+
+</div>

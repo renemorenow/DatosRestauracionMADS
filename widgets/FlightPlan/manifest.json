@@ -1,0 +1,11 @@
+{
+  "name": "FlightPlan",
+  "platform": "HTML",
+  "version": "2.12",
+  "wabVersion": "2.12",
+  "author": "Sulma Pedraza@Esri Colombia",
+  "description": "Playback Operaciones de la FAC",
+  "copyright": "Esri Colombia 2019",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0",
+  "featureActions": []
+}

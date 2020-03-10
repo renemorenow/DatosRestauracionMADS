@@ -1,0 +1,27 @@
+.jimu-widget-demo div:first-child{
+  color: red;
+}
+
+.claro .dijitTextBox {
+  height: 30px !important;
+  width: 100% !important;
+  font-size: 10px !important;
+}
+
+.narrow .dojoxCheckedMultiSelectWrapper {
+  width: 200px;
+}
+
+.scroll .dojoxCheckedMultiSelectWrapper {
+  overflow-x: scroll;
+}
+
+
+.wrap .dojoxMultiSelectItemLabel {
+  white-space: normal;
+}
+
+.wrap .dojoxMultiSelectItemBox {
+  vertical-align: top;
+  margin-top: 3px;
+}
