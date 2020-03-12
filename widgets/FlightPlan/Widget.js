@@ -9,6 +9,7 @@ define([
     "dojo/_base/array",
     'dojo/store/Memory',
     "dojo/parser",
+    "dojo/Deferred",
     'dijit/layout/TabContainer',
     'dijit/layout/ContentPane',
     'dijit/form/DateTextBox',
@@ -42,6 +43,7 @@ define([
     'esri/tasks/QueryTask',
     "esri/tasks/GeometryService",
     "esri/tasks/ProjectParameters",
+    "esri/tasks/StatisticDefinition",
     "esri/SpatialReference",
     "dojo/domReady!"],
     function (
@@ -55,6 +57,7 @@ define([
         array,
         Memory,
         parser,
+        Deferred,
         TabContainer,
         ContentPane,
         DateTextBox,
@@ -88,6 +91,7 @@ define([
         QueryTask,
         GeometryService,
         ProjectParameters,
+        StatisticDefinition,
         SpatialReference) {
 
         var widgetFlightPlan;
@@ -245,9 +249,13 @@ define([
                     queryTask.execute(query).then(function (featureSet) {
                         if (featureSet.features.length > 0) {
                             var dataFlightPlans = array.map(featureSet.features, function (flightPlan) {
-                                var projectType = featureSet.fields.find(element => element.name == 'type').hasOwnProperty('domain') ?
+                                var projectType;
+                                if (flightPlan.attributes.type != "") {
+                                    projectType = featureSet.fields.find(element => element.name == 'type').hasOwnProperty('domain') ?
                                     featureSet.fields.find(element => element.name == 'type').domain.codedValues.find(element => element.code == flightPlan.attributes.type).name :
                                     flightPlan.attributes.type;
+                                }
+                                
                                 return {
                                     // property names used here match those used when creating the dgrid
                                     "btnEdit": flightPlan.attributes.ID_PROJECT,
@@ -317,14 +325,13 @@ define([
                     // aircraftsSelect.autocomplete = "on";
                     // aircraftsSelect.defaultValue = "Seleccione una opción";
 
-                    widgetFlightPlan.filteringSelect = new FilteringSelect({
+                    widgetFlightPlan.originSelect = new FilteringSelect({
                         id: "aircraftsSelect",
                         name: "aircrafts",
-                        value: "",
+                        value: "code",
                         store: widgetFlightPlan.storeAircrafts,
                         searchAttr: "name"
                     }, "aircraftsSelect").startup();
-                    aircraftsSelect.autocomplete = "on";
                     aircraftsSelect.defaultValue = "Seleccione una opción";
 
                 });
@@ -612,52 +619,106 @@ define([
                     ));
                 }
             },
+
+            getNextObjectID: function getNextObjectID(layerObject, field) {
+                debugger;
+                var def = new Deferred();
+                var query = new Query();
+                query.where = "1=1";
+                if (layerObject.url === '') {
+                  def.resolve(null);
+                }
+                var statDef = new StatisticDefinition();
+                statDef.statisticType = "max";
+                statDef.onStatisticField = field;
+                statDef.outStatisticFieldName = "MAX_" + field;
+          
+                query.returnGeometry = false;
+                query.outStatistics = [statDef];
+                // console.info(this.uri);
+                var queryTask = new QueryTask(layerObject.url);
+                queryTask.execute(query, lang.hitch(this, function (respond) {
+                  if (respond && respond.features.length > 0) {
+                    if (typeof respond.features[0].attributes[statDef.outStatisticFieldName] === 'number') {
+                      def.resolve(respond.features[0].attributes[statDef.outStatisticFieldName] + 1);
+                    }
+                  } else {
+                    def.resolve(1);
+                  }
+                  def.resolve(null);
+                }), lang.hitch(this, function (err) {
+                  def.resolve(null);
+                }));
+                return def;
+            },
         
             applyEditProject: function() {
                 debugger;
-                var f = dojo.byId("frmMissionPlanning");
-                var eew = dijit.byId('aircrafts').get('value');
-                var aircraftsSelect = dojo.byId('aircrafts');
-                var aircraftsSelect2 = dijit.byId('aircraftsSelect').attr('value');
-                var strUser = aircraftsSelect.options[aircraftsSelect.selectedIndex].value;
+                //var f = dojo.byId("frmMissionPlanning");
+
+                var aircraftsSelect = dijit.byId("aircraftsSelect").item.value;
+
+                var txtEstablishmentDate = new Date(this.txtEstablishmentDate.value);
+                
                 var attributesFeature = {};
-                attributesFeature.name = dojo.byId("txtFlightPlanName").value;
-                attributesFeature.type = dojo.byId("aircraftsSelect").value;
-                attributesFeature.financial_ent = dojo.byId("txtFinancialEntity").value;
-                attributesFeature.execute_ent = dojo.byId("txtExecuteEntity").value;
-                attributesFeature.establishment = dojo.byId("txtEstablishmentDate").value;
-                attributesFeature.lead_time = dojo.byId("txtLeadTime").value;
-                attributesFeature.proj_value = dojo.byId("txtProjectValue").value;
-                attributesFeature.comment = dojo.byId("txtComment").value;
-                attributesFeature.budget_code = dojo.byId("txtBudgetCode").value;
-                // for(var i = 0; i < f.elements.length; i++){
-                //     var elem = f.elements[i];
-                //     if(elem.name == "button"){ continue; }
-                //     if (elem.type == "radio" && !elem.checked) { continue; }
-                //     if(elem.name == "txtFlightPlanName"){ attributesFeature.name = elem.value; }
-                //     if(elem.name == "aircraftsSelect"){ attributesFeature.type = elem.value; }
-                //     if(elem.name == "txtFinancialEntity"){ attributesFeature.financial_ent = elem.value; }
-                //     if(elem.name == "txtExecuteEntity"){ attributesFeature.execute_ent = elem.value; }
-                //     if(elem.name == "txtEstablishmentDate"){ attributesFeature.establishment = elem.value; }
-                //     if(elem.name == "txtLeadTime"){ attributesFeature.lead_time = elem.value; }
-                //     if(elem.name == "txtProjectValue"){ attributesFeature.proj_value = elem.value; }
-                //     if(elem.name == "txtComment"){ attributesFeature.comment = elem.value; }
-                //     if(elem.name == "txtBudgetCode"){ attributesFeature.budget_code = elem.value; }
-                //     // s += elem.name + ": " + elem.value + "\n";
-                // }
-                //var ssdsd = a;
-                var projectRecord = {
-                    attributes: attributesFeature
-                };
-                var flProjects = new FeatureLayer("https://services6.arcgis.com/hxAwRYAu9QHliJ8T/arcgis/rest/services/GBD_RESTAURACION/FeatureServer/2");
-                flProjects.applyEdits([projectRecord], null, null, 
-                    function(addResults) {
-                    dom.byId("divResult").innerHTML = "Registro creado satisfactoriamente";
-                    }, function (err) {
-                        dom.byId("divResult").innerHTML = err;
-                        alert(err);
-                    }
-                );
+                attributesFeature.name = this.txtFlightPlanName.value;
+                attributesFeature.type = this.aircraftsSelect.value;
+                attributesFeature.financial_ent = this.txtFinancialEntity.value;
+                attributesFeature.execute_ent = this.txtExecuteEntity.value;
+                attributesFeature.establishment = new Date(this.txtEstablishmentDate.value);
+                attributesFeature.lead_time = parseInt(this.txtLeadTime.value);
+                attributesFeature.proj_value = parseFloat(this.txtProjectValue.value);
+                attributesFeature.comment = this.txtComment.value;
+                attributesFeature.budget_code = this.txtBudgetCode.value;
+                
+                var featureLayer = new FeatureLayer("https://services6.arcgis.com/hxAwRYAu9QHliJ8T/arcgis/rest/services/GBD_RESTAURACION/FeatureServer/2");
+                // getNextObjectID(flProjects, "ID_PROJECT").then(function (_getNextObjectID) {
+                //     flProjects.applyEdits([projectRecord], null, null,
+                //         function (addResults) {
+                //             dom.byId("divResult").innerHTML = "Registro creado satisfactoriamente";
+                //         }, function (err) {
+                //             dom.byId("divResult").innerHTML = err;
+                //             alert(err);
+                //         }
+                //     );
+                // });
+                this.getNextObjectID(featureLayer, "ID_PROJECT").then(lang.hitch(this, function (nextID) {
+                    debugger;
+                    console.log('nextID:' + nextID);
+                    attributesFeature.ID_PROJECT = nextID;
+                    var params = {
+                        attributes: attributesFeature
+                    };
+                    // flProjects.applyEdits([params], null, null,
+                    //     function (addResults) {
+                    //         if (addResults.q) {
+                                
+                    //         } else {
+                                
+                    //         }
+                    //         dom.byId("divResult").innerHTML = "Registro creado satisfactoriamente";
+                    //     }, function (err) {
+                    //         dom.byId("divResult").innerHTML = err;
+                    //         alert(err);
+                    //     }
+                    // );
+                    featureLayer.applyEdits([params])
+                        .then(function (editsResult) {
+                            debugger;
+                                // Get the objectId of the newly added feature.
+                                // Call selectFeature function to highlight the new feature.
+                                if (editsResult.addResults[0].success) {
+                                    const objectId = editsResult.addResults[0].objectId;
+                                    dom.byId("divResult").innerHTML = "Registro creado satisfactoriamente";
+                                    // selectFeature(objectId);
+                                }
+                                })
+                                .catch(function(error) {
+                                console.log("===============================================");
+                                console.error("[ applyEdits ] FAILURE: ", error.code, error.name, error.message);
+                                console.log("error = ", error);
+                                });
+                  }));
             },
 
         });

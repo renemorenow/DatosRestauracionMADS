@@ -1,0 +1,303 @@
+<div data-dojo-attach-point="projectadmincontainer">
+    <div id="divGridProjects">
+        <table style="border: 0px; width:100%" cellspacing="10">
+            <tr>
+                <td>
+                    <div id="divProjectList" data-dojo-attach-point="listProjects">
+                        <table style="width:100%">
+                            <tr>
+                                <td style="width: 100%; height: auto; background-color:aliceblue">
+                                    <table style="width: 100%;">
+                                        <tr>
+                                            <td align="right" style="width:20%">
+                                                <label id="lblProject">${nls.Project}:</label>
+                                            </td>
+                                            <td colspan="2" valign="middle">
+                                                <input data-dojo-attach-point="txtProjectSearch" data-dojo-type="dijit/form/TextBox" name="txtProjectSearch" id="txtProjectSearch" style="height:25px !important" placeholder="${nls.Project}" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="right" style="width:20%">
+                                                <label id="lblProjectType">${nls.ProjectType}:</label>
+                                            </td>
+                                            <td valign="middle">
+                                                <select id="projectTypeSelectSearch" name="projectTypeSelectSearch" />
+                                            </td>
+                                            <td align="right">
+                                                <div class="ButtonSearch" data-dojo-attach-point="btnSearchProjects" role="button" tabindex="0" data-dojo-attach-event="click:searchProjects" aria-label="Buscar Proyectos"></div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr><td>&nbsp;</td></tr>
+                            <tr>
+                                <td style="width:100%; text-align:right;" align="right">
+                                    <div role="button" tabindex="0" title="${nls.CreateProject}" class="jimu-btn" data-dojo-attach-point="btnAddProject" data-dojo-attach-event="onclick:createProject">
+                                        ${nls.CreateProject}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:right;width:97%; height:auto; text-align:center;">
+                                    <div id="gridProjects"></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="tabContainerProjectData" data-dojo-type="dijit/layout/TabContainer" style="width: 100%; height:420px">
+        <div id="tabDetailsProject" data-dojo-type="dijit/layout/ContentPane" title="${nls.TitleTabProjectData}" data-dojo-props="selected:true">
+            <div id="divCreateProject" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="selected:true" style="width:100%;">
+                <form id="frmProjectData">
+                    <table style="border: 0px; width:100%" cellspacing="5">
+                        <tr>
+                            <td align="right" style="width:35%">
+                                <label for="lblProjectName">${nls.ProjectName}:</label><span class="atiRequiredField"> *</span>
+                            </td>
+                            <td>
+                                <input data-dojo-attach-point="txtProjectName" name="txtProjectName" data-dojo-type="dijit/form/TextBox" required="true" maxLength="100" placeholder="${nls.ProjectName}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <label for="lblProjectType">${nls.ProjectType}:</label><span class="atiRequiredField"> *</span>
+                            </td>
+                            <td>
+                                <input data-dojo-attach-point="projectTypeSelect" type="select" id="projectTypeSelect" required="true" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <label for="lblFinancialEntity">${nls.FinancialEntity}:</label>
+                            </td>
+                            <td>
+                                <input data-dojo-attach-point="txtFinancialEntity" name="txtFinancialEntity" data-dojo-type="dijit/form/TextBox" maxLength="100" placeholder="${nls.FinancialEntity}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <label for="lblExecuteEntity">${nls.ExecuteEntity}:</label>
+                            </td>
+                            <td>
+                                <input data-dojo-attach-point="txtExecuteEntity" name="txtExecuteEntity" data-dojo-type="dijit/form/TextBox" maxLength="100" placeholder="${nls.FinancialEntity}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <label for="lblEstablishmentDate">${nls.EstablishmentDate}:</label><span class="atiRequiredField"> *</span>
+                            </td>
+                            <td>
+                                <!-- <input data-dojo-id="txtEstablishmentDate" type="text" data-dojo-type="dijit/form/DateTextBox" required="true" data-dojo-attach-point="txtEstablishmentDate" name="txtEstablishmentDate" id="txtEstablishmentDate" required="true" onChange="myToDate.constraints.min = arguments[0];" /> -->
+                                <input data-dojo-id="txtEstablishmentDate" data-dojo-attach-point="txtEstablishmentDate" name="txtEstablishmentDate" id="txtEstablishmentDate" type="text" data-dojo-type="dijit/form/DateTextBox" required="true" required="true" onChange="myToDate.constraints.min = arguments[0];" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <label for="lblLeadTime">${nls.LeadTime}:</label><span class="atiRequiredField"> *</span>
+                            </td>
+                            <td>
+                                <input data-dojo-attach-point="txtLeadTime" name="txtLeadTime" data-dojo-type="dijit/form/TextBox" required="true" placeholder="${nls.LeadTime}" data-dojo-props="maxLength:2" type="number" maxLength="2" pattern="[0-9.]*" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <label for="lblProjectValue">${nls.ProjectValue}:</label>
+                            </td>
+                            <td>
+                                <input data-dojo-attach-point="txtProjectValue" name="txtProjectValue" data-dojo-type="dijit/form/TextBox" placeholder="${nls.ProjectValue}" maxLength="10" type="number" pattern="[0-9.]*" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <label for="lblComment">${nls.Observations}:</label>
+                            </td>
+                            <td>
+                                <input data-dojo-attach-point="txtComment" name="txtComment" data-dojo-type="dijit/form/TextBox" placeholder="${nls.Observations}" maxLength="255" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <label for="lblBudgetCode">${nls.BudgetCode}:</label>
+                            </td>
+                            <td>
+                                <input data-dojo-attach-point="txtBudgetCode" name="txtBudgetCode" data-dojo-type="dijit/form/TextBox" maxLength="255" placeholder="${nls.BudgetCode}"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <div id="divResultProject"></div>
+                </form>
+            </div>
+        </div>
+        <div id="tabStrategies" data-dojo-type="dijit/layout/ContentPane" title="${nls.TitleTabStrategies}">
+            <div style="width: 100%; height: 30px; background-color:aliceblue">
+                <table style="width: 100%;">
+                    <tr>
+                        <td align="right" style="width:20%">
+                            <label id="lblProject">${nls.Project}:</label>
+                        </td>
+                        <td valign="middle">
+                            <input data-dojo-attach-point="txtProject" data-dojo-type="dijit/form/TextBox" name="txtProject" readonly="readonly" style="height:25px !important" />
+                        </td>
+                    </tr>
+                    <tr><td>&nbsp;</td></tr>
+                </table>
+            </div>
+            <div id="divGridStrategies">
+                <table style="border: 0px; width:100%" cellspacing="0">
+                    <tr>
+                        <td>
+                            <div id="divStrategies" data-dojo-attach-point="listStrategies">
+                                <table style="width:100%">
+                                    <tr>
+                                        <td style="width:100%; text-align:right;" align="right">
+                                            <div class="ButtonAddRecord" data-dojo-attach-point="btnCreateStrategy" role="button" tabindex="0" data-dojo-attach-event="click:createStrategy" aria-label="Crear Estrategia">
+                                                <table>
+                                                    <tr>
+                                                        <td style="width:25px"><img src="/MADS/widgets/ProjectAdmin/images/Add.png" width="20" height="20" /></td>
+                                                        <td>${nls.CreateStrategy}</td>
+
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:right;width:100%; height:auto; text-align:center;">
+                                            <div id="gridStrategies"></div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="divCreateStrategy" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="selected:true" style="width:100%;">
+                <form id="frmStrategyData">
+                    <table style="border: 0px; width:100%" cellspacing="10">
+                        <tr>
+                            <td align="right" style="width:35%">
+                                <label for="lblApproach">${nls.Approach}:</label><span class="atiRequiredField"> *</span>
+                            </td>
+                            <td>
+                                <!-- <select id="approachesSelect" name="approachesSelect" required="true" data-dojo-attach-event="change:loadSelectStrategies"/> -->
+                                <input data-dojo-attach-point="approachesSelect" type="select" id="approachesSelect" name="approachesSelect" required="true" onChange="loadSelectStrategies"/>
+                                <!-- <div id="approachesSelect"></div> -->
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <label for="lblStrategy">${nls.Strategy}:</label><span class="atiRequiredField"> *</span>
+                            </td>
+                            <td>
+                                <select id="strategySelect" name="strategySelect" required="true" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <label for="lblArea">${nls.Area}:</label><span class="atiRequiredField"> *</span>
+                            </td>
+                            <td>
+                                <input data-dojo-attach-point="txtArea" name="txtArea" data-dojo-type="dijit/form/TextBox" maxLength="9" type="number" pattern="[0-9.]*" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" align="right">
+                                <div class="ButtonAddRecord" data-dojo-attach-point="btnCancelAddStrategy" role="button" tabindex="0" data-dojo-attach-event="click:cancelCreateStrategy" aria-label="Cancelar">
+                                    <table>
+                                        <tr>
+                                            <td style="width:25px"><img src="/MADS/widgets/ProjectAdmin/images/Cancel.png" width="20" height="20" /></td>
+                                            <td>${nls.Cancel}</td>
+
+                                        </tr>
+                                    </table>
+                                </div>&nbsp;&nbsp;&nbsp;
+                                <div class="ButtonAddRecord" data-dojo-attach-point="btnAddStrategy" role="button" tabindex="0" data-dojo-attach-event="click:addStrategy" aria-label="Agregar Estrategia">
+                                    <table>
+                                        <tr>
+                                            <td style="width:25px"><img src="/MADS/widgets/ProjectAdmin/images/OK.png" width="20" height="20" /></td>
+                                            <td>${nls.Save}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <div id="divResultStrategy"></div>
+                </form>
+            </div>
+        </div>
+        <div id="tabRestaurationAreas" data-dojo-type="dijit/layout/ContentPane" title="${nls.TitleTabRestaurationArea}" data-dojo-props="closable:true">
+            <div style="width: 100%; height: 30px; background-color:aliceblue">
+                <table style="width: 100%;">
+                    <tr>
+                        <td align="right" style="width:20%">
+                            <label id="lblProject">${nls.Project}:</label>
+                        </td>
+                        <td valign="middle">
+                            <input data-dojo-attach-point="txtProject2" data-dojo-type="dijit/form/TextBox" name="txtProject2" id="txtProject2" readonly="readonly" style="height:25px !important" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="divRestaurationAreas" style="width:100%; text-align:center">
+                <table style="border: 0px; width:100%" cellspacing="0">
+                    <tr><td style="height:40px">&nbsp;</td></tr>
+                    <tr>
+                        <td style="width:20%"></td>
+                        <td style="width:30%;" align="center">
+                            <div role="button" tabindex="1" title="${nls.Draw}" class="jimu-btn" style="width:80px !important; height:80px !important" data-dojo-attach-point="btnDrawArea" data-dojo-attach-event="onclick:cancelCreateStrategy">
+                                <p><img src="/MADS/widgets/ProjectAdmin/images/BrushBlanca.png" width="50" height="50" /></p>
+                                <p>${nls.Draw}</p>
+                            </div>
+                        </td>
+                        <td style="width:30%;" align="center">
+                            <div role="button" tabindex="0" title="${nls.Load}" class="jimu-btn" style="width:80px !important; height:80px !important" data-dojo-attach-point="btnUploadShape" data-dojo-attach-event="onclick:saveProject">
+                                <p><img src="/MADS/widgets/ProjectAdmin/images/UploadBlanca.png" width="50" height="50" /></p>
+                                <p>${nls.Load}</p>
+                            </div>
+                        </td>
+                        <td style="width:20%"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="divNavegacion" style="width: 100%; height: 40px; position:inherit; top:440px">
+        <table style="width:100%">
+            <tr>
+                <td style="width:30%;">
+                    <div class="ButtonNavigation" data-dojo-attach-point="btnBack" role="button" tabindex="0" data-dojo-attach-event="click:goBack" aria-label="Ir Atr�s">
+                        <table>
+                            <tr>
+                                <td style="width:35px"><img src="/MADS/widgets/ProjectAdmin/images/LeftArrow.png" width="30" height="30" /></td>
+                                <td style="margin-left:10px">${nls.Back}</td>
+                            </tr>
+                        </table>
+                       
+                    </div>
+                </td>
+                <td style="width:40%;" align="center">
+                    <div role="button" tabindex="1" title="${nls.SaveProject}" class="jimu-btn" style="width:170px !important" data-dojo-attach-point="btnSaveProject" data-dojo-attach-event="onclick:saveProject">
+                        ${nls.SaveProject}
+                    </div>
+                </td>
+                <td style="width:30%;" align="right">
+                    <div class="ButtonNavigation" data-dojo-attach-point="btnNext" role="button" tabindex="0" data-dojo-attach-event="click:goNext" aria-label="Siguiente">
+                        <table>
+                            <tr>
+                                <td>${nls.Next}</td>
+                                <td style="width:35px"><img src="/MADS/widgets/ProjectAdmin/images/RightArrow.png" width="30" height="30" /></td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+  
+</div>

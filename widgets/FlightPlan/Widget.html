@@ -32,7 +32,7 @@
                         <label for="lblFlightPlanName">${nls.FlightPlanName}:</label><span class="atiRequiredField"> *</span>
                     </td>
                     <td>
-                        <input data-dojo-attach-point="txtFlightPlanName" data-dojo-type="dijit/form/TextBox" name="txtFlightPlanName" id="txtFlightPlanName" required="true" />
+                        <input data-dojo-attach-point="txtProjectName" name="txtProjectName" id="txtProjectName" data-dojo-type="dijit/form/TextBox" required="true" maxLength="100" />
                     </td>
                 </tr>
                 <tr>
@@ -41,7 +41,7 @@
                     </td>
                     <td>
                         <!-- <select id="aircraftsSelect" name="aircraftsSelect" required="true" /> -->
-                        <input id="aircraftsSelect" required="true">
+                        <input data-dojo-attach-point="aircraftsSelect" type="select" id="aircraftsSelect"  required="true" />
                     </td>
                 </tr>
                 <tr>
@@ -49,7 +49,7 @@
                         <label for="lblFinancialEntity">${nls.FinancialEntity}:</label>
                     </td>
                     <td>
-                        <input data-dojo-attach-point="txtFinancialEntity" data-dojo-type="dijit/form/TextBox" name="txtFinancialEntity" id="txtFinancialEntity" />
+                        <input data-dojo-attach-point="txtFinancialEntity" name="txtFinancialEntity" id="txtFinancialEntity" data-dojo-type="dijit/form/TextBox" maxLength="100" />
                     </td>
                 </tr>
                 <tr>
@@ -57,7 +57,7 @@
                         <label for="lblExecuteEntity">${nls.ExecuteEntity}:</label>
                     </td>
                     <td>
-                        <input data-dojo-attach-point="txtExecuteEntity" data-dojo-type="dijit/form/TextBox" name="txtExecut-eEntity" id="txtExecuteEntity" />
+                        <input data-dojo-attach-point="txtExecuteEntity" name="txtExecut-eEntity" id="txtExecuteEntity" data-dojo-type="dijit/form/TextBox" maxLength="100" />
                     </td>
                 </tr>
                 <tr>
@@ -65,7 +65,8 @@
                         <label for="lblEstablishmentDate">${nls.EstablishmentDate}:</label><span class="atiRequiredField"> *</span>
                     </td>
                     <td>
-                        <input data-dojo-id="txtEstablishmentDate" type="text" data-dojo-type="dijit/form/DateTextBox" required="true" data-dojo-attach-point="txtEstablishmentDate" name="txtEstablishmentDate" id="txtEstablishmentDate" required="true" onChange="myToDate.constraints.min = arguments[0];" />
+                        <!-- <input data-dojo-attach-point="txtEstablishmentDate" name="txtEstablishmentDate" id="txtEstablishmentDate" data-dojo-id="txtEstablishmentDate" type="text" data-dojo-type="dijit/form/DateTextBox" required="true" required="true" onChange="myToDate.constraints.min = arguments[0];" /> -->
+                        <input data-dojo-id="txtEstablishmentDate" type="text" data-dojo-type="dijit/form/DateTextBox" required="true" data-dojo-attach-point="txtEstablishmentDate" name="txtEstablishmentDate" id="txtEstablishmentDate" required="true" onChange="myToDate.constraints.min = arguments[0];" maxLength="10" />
                     </td>
                 </tr>
                 <tr>
@@ -73,7 +74,7 @@
                         <label for="lblLeadTime">${nls.LeadTime}:</label><span class="atiRequiredField"> *</span>
                     </td>
                     <td>
-                        <input data-dojo-attach-point="txtLeadTime" data-dojo-type="dijit/form/TextBox" name="txtExecut-eEntity" id="txtLeadTime" required="true"/>
+                        <input data-dojo-attach-point="txtLeadTime" name="txtLeadTime" id="txtLeadTime" data-dojo-type="dijit/form/TextBox" required="true" data-dojo-props="maxLength:2" type="number" maxLength="2" pattern="[0-9.]*"/>
                     </td>
                 </tr>
                 <tr>
@@ -81,7 +82,7 @@
                         <label for="lblProjectValue">${nls.ProjectValue}:</label>
                     </td>
                     <td>
-                        <input data-dojo-attach-point="txtProjectValue" data-dojo-type="dijit/form/TextBox" name="txtExecut-eEntity" id="txtProjectValue" />
+                        <input data-dojo-attach-point="txtProjectValue" name="txtProjectValue" id="txtProjectValue" data-dojo-type="dijit/form/TextBox" maxLength="10" type="number" pattern="[0-9.]*"/>
                     </td>
                 </tr>
                 <tr>
@@ -89,7 +90,7 @@
                         <label for="lblComment">${nls.Comment}:</label>
                     </td>
                     <td>
-                        <input data-dojo-attach-point="txtComment" data-dojo-type="dijit/form/TextBox" name="txtExecut-eEntity" id="txtComment" />
+                        <input data-dojo-attach-point="txtComment" name="txtComment" id="txtComment" data-dojo-type="dijit/form/TextBox" placeholder="Observaciones" maxLength="255"/>
                     </td>
                 </tr>
                 <tr>
@@ -97,7 +98,7 @@
                         <label for="lblBudgetCode">${nls.BudgetCode}:</label>
                     </td>
                     <td>
-                        <input data-dojo-attach-point="txtBudgetCode" data-dojo-type="dijit/form/TextBox" name="txtExecut-eEntity" id="txtBudgetCode" />
+                        <input data-dojo-attach-point="txtBudgetCode" name="txtBudgetCode" id="txtBudgetCode" data-dojo-type="dijit/form/TextBox" maxLength="255"/>
                     </td>
                 </tr>
             </table>
