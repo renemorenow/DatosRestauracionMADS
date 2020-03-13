@@ -94,13 +94,16 @@ define([
   StatisticDefinition,
   SpatialReference
 ) {
-  var widgetAdminProjects;
-  var gridProjects;
-  var gridStrategies;
-  var operation; //I: Inserción,  A: Actualización,  B: Borrado
-  var operationStrategy; //I: Inserción,  A: Actualización,  B: Borrado
-  var storeProjectTypes;
-  var storeApproaches;
+    var widgetAdminProjects;
+    var gridProjects;
+    var gridStrategies;
+    var operation; //I: Inserción,  A: Actualización,  B: Borrado
+    var operationStrategy; //I: Inserción,  A: Actualización,  B: Borrado
+    var storeProjectTypes;
+    var storeApproaches;
+    var storeStrategies;
+    var arrayStrategiesApproaches;
+    var arrayStrategies;
 
   return declare([BaseWidget, _WidgetsInTemplateMixin], {
     name: "ProjectAdmin",
@@ -110,11 +113,11 @@ define([
     approachesSelect: null,
     originSelect: null,
     destinationSelect: null,
-    postMixInProperties: function() {},
+    postMixInProperties: function () { },
 
-    postCreate: function() {
-      this.inherited(arguments);
-      console.log("postCreate");
+    postCreate: function () {
+        this.inherited(arguments);
+        console.log("postCreate");
     },
 
     startup: function() {
@@ -127,6 +130,7 @@ define([
       this.loadProjects();
       this.loadSelectProjectTypes();
       this.loadSelectApproaches();
+      this.loadSelectStrategies();
       this.loadGridStrategies();
     },
 
@@ -224,23 +228,10 @@ define([
         "gridProjects"
       );
       this.gridProjects.on(".field-IdProject:click", this.selectProject);
-      this.gridProjects.on(".field-OBJECTID:click", this.deleteProject);
-      // this.gridProjects.on(".field-OBJECTID:click", lang.hitch(this, function (approachesSelect) {
-      //   var featureLayer = new FeatureLayer(
-      //     widgetAdminProjects.config.urlProjectsService
-      //   );
-      //   var attributesFeature = {
-      //       OBJECTID : e.srcElement.alt
-      //   }
-      //   var params = {
-      //       deleteFeatures: [attributesFeature]
-      //   };
-      //   this.applyEditsProject(featureLayer, params);
-      // })
-      // );
+      this.gridProjects.on(".field-OBJECTID:click", widgetAdminProjects.deleteProject);
       
-      //this.grid.store.setData([]);
-      //this.grid.refresh();
+      this.gridProjects.store.setData([]);
+      this.gridProjects.refresh();
     },
 
     loadProjects: function(Memory) {
@@ -255,9 +246,7 @@ define([
         query.where = "1=1";
         queryTask.execute(query).then(function(featureSet) {
           if (featureSet.features.length > 0) {
-            var dataProjects = array.map(featureSet.features, function(
-              project
-            ) {
+            var dataProjects = array.map(featureSet.features, function(project) {
               var projectType;
               if (project.attributes.type != "") {
                 projectType = featureSet.fields
@@ -294,58 +283,118 @@ define([
       }
     },
 
-    loadGridStrategies: function() {
-      var divGrid = dojo.byId("gridStrategies");
-      divGrid.innerHTML = "";
+    loadGridStrategies: function () {
+            var divGrid = dojo.byId("gridStrategies");
+            divGrid.innerHTML = "";
 
-      this.gridStrategies = new (declare([
-        Grid,
-        Selection,
-        Pagination,
-        ColumnResizer,
-        ColumnHider
-      ]))(
-        {
-          selectionMode: "single",
-          store: Memory({
-            idProperty: "IdStrategy"
-          }),
-          columns: {
-            btnEdit: {
-              id: "btnEdit",
-              label: "", //wasn't able to inject an HTML <div> with image here
-              field: "IdStrategy",
-              formatter: this.createEditButton,
-              width: "35",
-              resizable: "false"
-            },
-            Approach: {
-              label: widgetAdminProjects.nls.Approach,
-              width: "70",
-              resizable: "true"
-            },
-            Strategy: {
-              label: widgetAdminProjects.nls.Strategy,
-              width: "90",
-              resizable: "true",
-              formatter: this.formatDate
-            },
-            Area: {
-              label: widgetAdminProjects.nls.Area,
-              width: "70",
-              resizable: "true"
-            }
-          }
-          /*sort: sortAttr*/
+            this.gridStrategies = new (declare([
+                Grid,
+                Selection,
+                Pagination,
+                ColumnResizer,
+                ColumnHider
+            ]))(
+                {
+                    selectionMode: "single",
+                    store: Memory({
+                        idProperty: "IdStrategy"
+                    }),
+                    columns: {
+                        btnEdit: {
+                            id: "btnEdit",
+                            label: "", //wasn't able to inject an HTML <div> with image here
+                            field: "ObjectId",
+                            formatter: this.createEditButton,
+                            width: "30",
+                            resizable: "false"
+                        },
+                        btnDelete: {
+                            id: "btnDelete",
+                            label: "", //wasn't able to inject an HTML <div> with image here
+                            field: "ObjectId",
+                            formatter: this.createDeleteButton,
+                            width: "30",
+                            resizable: "false"
+                        },
+                        IdProject: {
+                            label: widgetAdminProjects.nls.IdProject,
+                            field: "IdProject",
+                            hidden: "true"
+                        },
+                        Approach: {
+                            label: widgetAdminProjects.nls.Approach,
+                            field: "Approach",
+                            width: "70",
+                            resizable: "true"
+                        },
+                        IdStrategy: {
+                            label: widgetAdminProjects.nls.Strategy,
+                            field: "IdStrategy",
+                            hidden: "true"
+                        },
+                        Strategy: {
+                            label: widgetAdminProjects.nls.Strategy,
+                            field: "Strategy",
+                            width: "120",
+                            resizable: "true"
+                        },
+                        Area: {
+                            label: widgetAdminProjects.nls.Area,
+                            field: "Area",
+                            width: "70",
+                            resizable: "true"
+                        }
+                    }
+                    /*sort: sortAttr*/
+                },
+                "gridStrategies"
+            );
+
+            this.gridStrategies.on(".field-IdStrategy:click", this.selectStrategy);
+            this.gridStrategies.store.setData([]);
+            dojo.style(dojo.byId("gridStrategies"), "height", "250px");
+            this.gridStrategies.refresh();
         },
-        "gridStrategies"
-      );
 
-      //this.gridStrategies.on(".field-IdStrategy:click", this.selectFlighPlan);
-      this.gridStrategies.store.setData([]);
-      dojo.style(dojo.byId("gridStrategies"), "height", "250px");
-      this.gridStrategies.refresh();
-    },
+    loadStrategiesProject: function (Memory) {
+            try {
+                queryTask = new QueryTask(
+                    widgetAdminProjects.config.urlProjectStrategiesService
+                );
+                var query = new Query();
+                query = new esri.tasks.Query();
+                query.returnGeometry = false;
+                query.outFields = ["*"];
+                query.where = "ID_PROJECT = " + widgetAdminProjects.hiddenProjectId.value;
+                queryTask.execute(query).then(function (featureSet) {
+                    if (featureSet.features.length > 0) {
+                        debugger;
+                        var dataStrategiesProject = array.map(featureSet.features, function (strategy) {
+                            var strategyApproach, strategyDesc;
+                            
+                            return {
+                                // property names used here match those used when creating the dgrid
+                                ObjectId: strategy.attributes.OBJECTID,
+                                btnEdit: strategy.attributes.OBJECTID,
+                                btnDelete: strategy.attributes.OBJECTID,
+                                IdProject: strategy.attributes.ID_PROJECT,
+                                Approach: strategy.attributes.approach,
+                                IdStrategy: strategy.attributes.strategy,
+                                Strategy: strategy.attributes.strategy,
+                                Area: strategy.attributes.area
+                            };
+                        });
+                        widgetAdminProjects.gridStrategies.store.setData(dataStrategiesProject);
+                        widgetAdminProjects.gridStrategies.refresh();
+                    } else {
+                        console.log("No se encontraron registros de planes de vuelos!");
+                    }
+                });
+            } catch (e) {
+                alert(e.toString());
+                //this.showProcessing(false, "")
+            }
+        },
 
     createEditButton: function(id) {
       var zBtn =
@@ -377,13 +426,10 @@ define([
       query.returnGeometry = false;
       query.outFields = ["*"];
       query.where = "1=1";
-      // query.orderByFields = ["MATRICULA"];
       queryTask.execute(query).then(function(featureSet) {
-        if (
-          featureSet.fields.find(element => element.name == "type").domain
-            .codedValues.length > 0
-        ) {
-          dojo.forEach(
+        if (featureSet.fields.find(element => element.name == "type").domain.codedValues.length > 0)
+          { 
+            dojo.forEach(
             featureSet.fields.find(element => element.name == "type").domain
               .codedValues,
             dojo.hitch(this, function(feature) {
@@ -430,121 +476,190 @@ define([
       });
     },
 
-    loadSelectApproaches: function() {
-      //debugger;
-      var arrayToMemory = new Array();
-      // debugger;
-      queryTask = new QueryTask(
-        widgetAdminProjects.config.urlApproachStrategiesService
-      );
-      var query = new Query();
-      query = new esri.tasks.Query();
-      query.returnGeometry = false;
-      query.outFields = ["Enfoque"];
-      query.returnDistinctValues = true;
-      query.where = "1=1";
-      queryTask.execute(query).then(function(featureSet) {
-        if (featureSet.features.length > 0) {
-          dojo.forEach(
-            featureSet.features,
-            dojo.hitch(this, function(feature) {
-              arrayToMemory.push({
-                value: feature.attributes.Enfoque,
-                name: feature.attributes.Enfoque
-              });
-            })
-          );
-        }
-        widgetAdminProjects.storeSelectApproach = new Memory({
-          data: arrayToMemory
-        });
+    loadSelectApproaches: function () {
+            //debugger;
+            var arrayToMemory = new Array();
+            // debugger;
+            queryTask = new QueryTask(
+                widgetAdminProjects.config.urlApproachStrategiesService
+            );
+            var query = new Query();
+            query = new esri.tasks.Query();
+            query.returnGeometry = false;
+            query.outFields = ["Enfoque"];
+            query.returnDistinctValues = true;
+            query.where = "1=1";
+            queryTask.execute(query).then(function (featureSet) {
+                if (featureSet.features.length > 0) {
+                    dojo.forEach(
+                        featureSet.features,
+                        dojo.hitch(this, function (feature) {
+                            arrayToMemory.push({
+                                value: feature.attributes.Enfoque,
+                                name: feature.attributes.Enfoque
+                            });
+                        })
+                    );
+                }
+                widgetAdminProjects.storeSelectApproach = new Memory({
+                    data: arrayToMemory
+                });
 
-        var filteringSelect = new FilteringSelect(
-          {
-            id: "approachesSelect",
-            // onChange: function (value)
-            // {
-            //     console.log("project Id: ", this.get("value"))
-            //     loadSelectStrategies(value,satpcontext);
-            // },
-            name: "approachesSelect",
-            value: "Enfoque",
-            store: widgetAdminProjects.storeSelectApproach,
-            searchAttr: "name",
-            required: true,
-            intermediateChanges: true,
-            onChange: lang.hitch(this, function(approachesSelect) {
-              console.log("project Id: ", this.get("value"));
-              this.loadSelectStrategies(approachesSelect);
-              // dijit.byId('strategySelect').query.state = this.item.approachesSelect || /.*/;
-              // dijit.byId('strategySelect').query.state = this.item.approachesSelect || /.*/;
-            })
-          },
-          "approachesSelect"
-        ); //.startup();
-        filteringSelect.startup();
-        filteringSelect.watch(
-          "displayedValue",
-          lang.hitch(
-            this,
-            this.approachesSelectHandler,
-            this.approachesSelect.value
-          )
-        );
-        //     .on(widgetAdminProjects.approachesSelect, 'change', function (value) {
-        //     console.log(value);
-        //   });
-        // dojo.connect(widgetAdminProjects.approachesSelect, 'onChange', function(value){console.log(value)});
-        approachesSelect.defaultValue = "Seleccione una opción";
-      });
-    },
+                widgetAdminProjects.approachesSelect = new FilteringSelect({
+                    id: "approachesSelect",
+                    name: "approachesSelect",
+                    value: "Enfoque",
+                    store: widgetAdminProjects.storeSelectApproach,
+                    searchAttr: "name",
+                    required: true,
+                    intermediateChanges: true,
+                }, "approachesSelect");
 
-    approachesSelectHandler: function(who, property, oldValue, newValue) {
-      console.info(who, property, oldValue, newValue);
-    },
+                widgetAdminProjects.approachesSelect.defaultValue = "Seleccione una opción";
 
-    loadSelectStrategies: function(approach) {
-      debugger;
-      var arrayToMemory = new Array();
-      // debugger;
-      queryTask = new QueryTask(
-        widgetAdminProjects.config.urlApproachStrategiesService
-      );
-      var query = new Query();
-      query = new esri.tasks.Query();
-      query.returnGeometry = false;
-      query.outFields = ["Enfoque"];
-      query.returnDistinctValues = true;
-      query.where = "Enfoque='" + approach + "'";
-      queryTask.execute(query).then(function(featureSet) {
-        if (featureSet.features.length > 0) {
-          dojo.forEach(
-            featureSet.features,
-            dojo.hitch(this, function(feature) {
-              arrayToMemory.push({
-                value: feature.attributes.ID_ENF_ESTG,
-                name: feature.attributes.Estrategias
-              });
-            })
-          );
-        }
-        widgetAdminProjects.storeSelectApproach = new Memory({
-          data: arrayToMemory
-        });
+                widgetAdminProjects.approachesSelect.watch('item', function (property, oldValue, newValue) {
+                    widgetAdminProjects.approachesSelectHandler(newValue);
+                });
 
-        widgetAdminProjects.strategySelect = new FilteringSelect(
-          {
-            id: "strategySelect",
-            name: "strategy",
-            value: "ID_ENF_ESTG",
-            store: widgetAdminProjects.storeAircrafts,
-            searchAttr: "name"
-          },
-          "strategySelect"
-        ).startup();
-        strategySelect.defaultValue = "Seleccione una opción";
-      });
-    },
+                widgetAdminProjects.approachesSelect.startup();
+            });
+        },
+
+        approachesSelectHandler: function (approach) {
+            //debugger;
+            var filterStrategies = widgetAdminProjects.arrayStrategiesApproaches.filter(
+                function (element) {
+                    return element.approach == approach.value;
+                }
+            );
+            var keyArray = filterStrategies.map(function (item) {
+                delete item.approach;
+                return item;
+            });
+
+            widgetAdminProjects.storeStrategies = new Memory({
+                data: keyArray
+            });
+
+            widgetAdminProjects.strategiesSelect.store = widgetAdminProjects.storeStrategies;
+            widgetAdminProjects.strategiesSelect.startup();
+        },
+
+        loadSelectStrategies: function (approach) {
+           
+            widgetAdminProjects.arrayStrategiesApproaches = new Array();
+            // debugger;
+            queryTask = new QueryTask(
+                widgetAdminProjects.config.urlApproachStrategiesService
+            );
+            var query = new Query();
+            query = new esri.tasks.Query();
+            query.returnGeometry = false;
+            query.outFields = ["Enfoque, ID_ENF_ESTG, Estrategias"];
+            query.returnDistinctValues = true;
+            // query.where = "1=1";
+            query.where = "Enfoque='" + approach + "'";
+            //query.where = "Enfoque=\'" + approach + "\'";
+            queryTask.execute(query).then(function (featureSet) {
+                if (featureSet.features.length > 0) {
+                    dojo.forEach(
+                        featureSet.features,
+                        dojo.hitch(this, function (feature) {
+                            widgetAdminProjects.arrayStrategiesApproaches.push({
+                                approach: feature.attributes.Enfoque,
+                                value: feature.attributes.ID_ENF_ESTG,
+                                name: feature.attributes.Estrategias
+                            });
+                        })
+                    );
+                }
+                
+                widgetAdminProjects.storeStrategies = new Memory({
+                    data: []
+                });
+
+                widgetAdminProjects.strategiesSelect = new FilteringSelect({
+                    id: "strategiesSelect",
+                    name: "strategiesSelect",
+                    value: "ID_ENF_ESTG",
+                    store: widgetAdminProjects.storeStrategies,
+                    searchAttr: "name"
+                }, "strategiesSelect");
+                widgetAdminProjects.strategiesSelect.defaultValue = "Seleccione una opción";
+                widgetAdminProjects.strategiesSelect.startup();
+
+            });
+        },
+
+        selectProject: function (e) {
+            //debugger;
+            var row = widgetAdminProjects.gridProjects.row(e);
+            widgetAdminProjects.gridProjects.select(row);
+
+            widgetAdminProjects.hiddenProjectId.value = row.data.IdProject
+            widgetAdminProjects.txtProjectName.setValue(row.data.ProjectValue);
+
+            widgetAdminProjects.operation = "A";
+            widgetAdminProjects.toggleGridProjects(false);
+
+            // Actualizar nombre del proyecto en los tabs 
+            var tabContainer = dijit.byId("tabContainerProjectData");
+            tabContainer.watch("selectedChildWidget", function (name, oval, nval) {
+                widgetAdminProjects.txtProject.setValue(widgetAdminProjects.txtProjectName.value);
+                widgetAdminProjects.txtProject2.setValue(widgetAdminProjects.txtProjectName.value);
+                //console.log("selected child changed from ", oval, " to ", nval);
+            });
+            widgetAdminProjects.loadStrategiesProject();
+        },
+
+        toggleGridProjects: function (showGrid) {
+            var tabContainerProjectData = dojo.byId("tabContainerProjectData");
+            var divGridProjects = dojo.byId("divGridProjects");
+            var divNavegacion = dojo.byId("divNavegacion");
+            //var divButtonsCreateFlightPlan = dojo.byId("divButtonsCreateFlightPlan");
+            if (showGrid) {
+                tabContainerProjectData.style.display = "none";
+                divNavegacion.style.display = "none";
+                divGridProjects.style.display = "inline";
+            } else {
+                tabContainerProjectData.style.display = "inline";
+                divNavegacion.style.display = "block";
+                divGridProjects.style.display = "none";
+            }
+        },
+
+        selectStrategy: function (e) {
+            debugger;
+            var row = widgetAdminProjects.gridStrategies.row(e);
+            widgetAdminProjects.gridStrategies.select(row);
+
+            widgetAdminProjects.hiddenObjectIdStrategy.value = row.data.ObjectId
+            
+            widgetAdminProjects.approachesSelect.value = row.data.Approach;
+            widgetAdminProjects.strategiesSelect.value = row.data.IdStrategy;
+            widgetAdminProjects.txtArea.setValue(row.data.Area);
+            
+            widgetAdminProjects.operationStrategy = "A";
+            widgetAdminProjects.toggleGridStrategies(false);
+
+            
+        },
+
+        toggleGridStrategies: function (showGrid) {
+            var divStrategyData = dojo.byId("divCreateStrategy");
+            var divGridStrategies = dojo.byId("divGridStrategies");
+            //var divButtonsCreateFlightPlan = dojo.byId("divButtonsCreateFlightPlan");
+            if (showGrid) {
+                divStrategyData.style.display = "none";
+                //divButtonsCreateFlightPlan.style.display = "none";
+                divGridStrategies.style.display = "inline";
+            } else {
+                divStrategyData.style.display = "inline";
+                //divButtonsCreateFlightPlan.style.display = "block";
+                divGridStrategies.style.display = "none";
+            }
+        },
+
 
     selectProject: function(e) {
       //debugger;
@@ -608,50 +723,52 @@ define([
       }
     },
 
-    createProject: function() {
-      widgetAdminProjects.operation = "I";
-      widgetAdminProjects.toggleGridProjects(false);
-    },
+    createProject: function () {
+            widgetAdminProjects.operation = "I";
+            widgetAdminProjects.hiddenProjectId.value = "-1";
+            widgetAdminProjects.toggleGridProjects(false);
+        },
 
-    goBack: function() {
-      //debugger;
-      var tabContainer = dijit.byId("tabContainerProjectData");
-      if (tabContainer.selectedChildWidget == dijit.byId("tabDetailsProject")) {
-        widgetAdminProjects.toggleGridProjects(true);
-      } else if (
-        tabContainer.selectedChildWidget == dijit.byId("tabStrategies")
-      ) {
-        tabContainer.selectChild(dijit.byId("tabDetailsProject"));
-      } else if (
-        tabContainer.selectedChildWidget == dijit.byId("tabRestaurationAreas")
-      ) {
-        tabContainer.selectChild(dijit.byId("tabStrategies"));
-      }
-    },
+        goBack: function () {
+            //debugger;
+            var tabContainer = dijit.byId("tabContainerProjectData");
+            if (tabContainer.selectedChildWidget == dijit.byId("tabDetailsProject")) {
+                widgetAdminProjects.toggleGridProjects(true);
+            } else if (
+                tabContainer.selectedChildWidget == dijit.byId("tabStrategies")
+            ) {
+                tabContainer.selectChild(dijit.byId("tabDetailsProject"));
+            } else if (
+                tabContainer.selectedChildWidget == dijit.byId("tabRestaurationAreas")
+            ) {
+                tabContainer.selectChild(dijit.byId("tabStrategies"));
+            }
+        },
 
-    goNext: function() {
-      //debugger;
-      var tabContainer = dijit.byId("tabContainerProjectData");
-      if (tabContainer.selectedChildWidget == dijit.byId("tabDetailsProject")) {
-        tabContainer.selectChild(dijit.byId("tabStrategies"));
-      } else if (
-        tabContainer.selectedChildWidget == dijit.byId("tabStrategies")
-      ) {
-        tabContainer.selectChild(dijit.byId("tabRestaurationAreas"));
-      }
-    },
+        goNext: function () {
+            //debugger;
+            var tabContainer = dijit.byId("tabContainerProjectData");
+            if (tabContainer.selectedChildWidget == dijit.byId("tabDetailsProject")) {
+                tabContainer.selectChild(dijit.byId("tabStrategies"));
+            } else if (
+                tabContainer.selectedChildWidget == dijit.byId("tabStrategies")
+            ) {
+                tabContainer.selectChild(dijit.byId("tabRestaurationAreas"));
+            }
+        },
 
-    createStrategy: function() {
-      widgetAdminProjects.operationStrategy = "I";
-      widgetAdminProjects.toggleGridStrategies(false);
-    },
+        createStrategy: function () {
+            widgetAdminProjects.operationStrategy = "I";
+            widgetAdminProjects.toggleGridStrategies(false);
+        },
 
-    cancelCreateStrategy: function() {
-      //widgetActivityReport.cleanForm();
-      widgetAdminProjects.toggleGridStrategies(true);
-    },
+        cancelCreateStrategy: function () {
+            //widgetActivityReport.cleanForm();
+            widgetAdminProjects.toggleGridStrategies(true);
+        },
 
-    searchProjects: function() {},
+        searchProjects: function () { },
+
 
     getMapLayer: function(urlLayer) {
       //debugger;
@@ -895,7 +1012,6 @@ define([
 
     applyEditStrategies: function(ID_PROJECT) {
       debugger;
-
       var aircraftsSelect = dijit.byId("aircraftsSelect").item.value;
 
       var txtEstablishmentDate = new Date(this.txtEstablishmentDate.value);

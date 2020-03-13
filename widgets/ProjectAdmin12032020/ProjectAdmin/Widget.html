@@ -1,4 +1,4 @@
-<div data-dojo-attach-point="projectadmincontainer">
+﻿<div data-dojo-attach-point="projectadmincontainer">
     <div id="divGridProjects">
         <table style="border: 0px; width:100%" cellspacing="10">
             <tr>
@@ -125,7 +125,7 @@
                                 <label for="lblBudgetCode">${nls.BudgetCode}:</label>
                             </td>
                             <td>
-                                <input data-dojo-attach-point="txtBudgetCode" name="txtBudgetCode" data-dojo-type="dijit/form/TextBox" maxLength="255" placeholder="${nls.BudgetCode}"/>
+                                <input data-dojo-attach-point="txtBudgetCode" name="txtBudgetCode" data-dojo-type="dijit/form/TextBox" maxLength="255" placeholder="${nls.BudgetCode}" />
                             </td>
                         </tr>
                     </table>
@@ -181,13 +181,12 @@
                 <form id="frmStrategyData">
                     <table style="border: 0px; width:100%" cellspacing="10">
                         <tr>
-                            <td align="right" style="width:35%">
+                            <td align="right" style="width:25%">
                                 <label for="lblApproach">${nls.Approach}:</label><span class="atiRequiredField"> *</span>
                             </td>
                             <td>
-                                <!-- <select id="approachesSelect" name="approachesSelect" required="true" data-dojo-attach-event="change:loadSelectStrategies"/> -->
-                                <input data-dojo-attach-point="approachesSelect" type="select" id="approachesSelect" name="approachesSelect" required="true" onChange="loadSelectStrategies"/>
-                                <!-- <div id="approachesSelect"></div> -->
+                                <input data-dojo-attach-point="hiddenObjectIdStrategy" name="hiddenObjectIdStrategy" type="hidden" />
+                                <div id="approachesSelect"></div>
                             </td>
                         </tr>
                         <tr>
@@ -195,7 +194,7 @@
                                 <label for="lblStrategy">${nls.Strategy}:</label><span class="atiRequiredField"> *</span>
                             </td>
                             <td>
-                                <select id="strategySelect" name="strategySelect" required="true" />
+                                <div id="strategiesSelect"></div>
                             </td>
                         </tr>
                         <tr>
@@ -213,6 +212,7 @@
                                         <tr>
                                             <td style="width:25px" valign="middle"><img src="/MADS/widgets/ProjectAdmin/images/Cancel.png" width="20" height="20" /></td>
                                             <td valign="middle">${nls.Cancel}</td>
+
                                         </tr>
                                     </table>
                                 </div>&nbsp;&nbsp;&nbsp;
@@ -278,7 +278,7 @@
                                 <td style="margin-left:10px">${nls.Back}</td>
                             </tr>
                         </table>
-                       
+
                     </div>
                 </td>
                 <td style="width:40%;" align="center">
@@ -299,5 +299,5 @@
             </tr>
         </table>
     </div>
-  
+
 </div>

@@ -99,20 +99,15 @@ define([
   var gridStrategies;
   var operation; //I: Inserción,  A: Actualización,  B: Borrado
   var operationStrategy; //I: Inserción,  A: Actualización,  B: Borrado
-  var arrayCboAirports;
-  var mapLayers;
-  var featureLayerAirports;
-  var objectIds;
-  var graphicsLayerTrajectory;
-  var arrayLegs;
-  var storeAircrafts;
-  var storeAirports;
-  var portal;
+  var storeProjectTypes;
+  var storeApproaches;
 
   return declare([BaseWidget, _WidgetsInTemplateMixin], {
     name: "ProjectAdmin",
     baseClass: "esri-widget-pb",
+    projectTypeSelectSearch: null,
     projectTypeSelect: null,
+    approachesSelect: null,
     originSelect: null,
     destinationSelect: null,
     postMixInProperties: function() {},
@@ -120,14 +115,6 @@ define([
     postCreate: function() {
       this.inherited(arguments);
       console.log("postCreate");
-      //SET EL TAMAÑO DEL PANEL
-      //var panel = this.getPanel();
-      //var pos = panel.position;
-      //pos.top = 40;
-      //pos.left = 10;
-      //console.log(pos);
-      //panel.setPosition(pos);
-      //panel.panelManager.normalizePanel(panel);
     },
 
     startup: function() {
@@ -138,15 +125,9 @@ define([
       widgetAdminProjects.objectIds = [];
       this.loadGridProjects();
       this.loadProjects();
-      this.loadProjectTypes();
+      this.loadSelectProjectTypes();
+      this.loadSelectApproaches();
       this.loadGridStrategies();
-      //this.loadAirports();
-      this.graphicsLayerTrajectory = new GraphicsLayer({
-        id: "FlightTrajectory"
-      });
-      var infoTemplate = new esri.InfoTemplate("${name}", "${description}");
-      this.graphicsLayerTrajectory.setInfoTemplate(infoTemplate);
-      this.map.addLayer(this.graphicsLayerTrajectory);
     },
 
     onOpen: function() {
@@ -154,7 +135,7 @@ define([
       this.toggleGridProjects(true);
       this.toggleGridStrategies(true);
       // this.getMapLayer(widgetAdminProjects.config.urlAirportsGisService);
-      this.getMapLayer(widgetAdminProjects.config.urlProjectsService);
+      //this.getMapLayer(widgetAdminProjects.config.urlProjectsService);
       //this.setSelectionSymbol(this.featureLayerAirports);
     },
 
@@ -193,19 +174,28 @@ define([
         {
           selectionMode: "single",
           store: Memory({
-            idProperty: "IdFlightOrder"
+              idProperty: "IdProject",
+              OBJECTID: "OBJECTID"
           }),
           columns: {
             btnEdit: {
               id: "btnEdit",
-              label: "", //wasn't able to inject an HTML <div> with image here
-              field: "IdFlightOrder",
+              label: "Ver", //wasn't able to inject an HTML <div> with image here
+              field: "IdProject",
               formatter: this.createEditButton,
-              width: "35",
+              width: "60",
               resizable: "false"
-            },
-            IdFlightOrder: {
-              label: widgetAdminProjects.nls.IdFlightOrder,
+              },
+              btnDelete: {
+                id: "btnDelete",
+                label: "Ver", //wasn't able to inject an HTML <div> with image here
+                field: "OBJECTID",
+                formatter: this.createDeleteButton,
+                width: "60",
+                resizable: "false"
+                },
+            IdProject: {
+              label: widgetAdminProjects.nls.IdProject,
               hidden: "true"
             },
             ProjectType: {
@@ -233,8 +223,22 @@ define([
         },
         "gridProjects"
       );
-
-      this.gridProjects.on(".field-IdFlightOrder:click", this.selectFlighPlan);
+      this.gridProjects.on(".field-IdProject:click", this.selectProject);
+      this.gridProjects.on(".field-OBJECTID:click", this.deleteProject);
+      // this.gridProjects.on(".field-OBJECTID:click", lang.hitch(this, function (approachesSelect) {
+      //   var featureLayer = new FeatureLayer(
+      //     widgetAdminProjects.config.urlProjectsService
+      //   );
+      //   var attributesFeature = {
+      //       OBJECTID : e.srcElement.alt
+      //   }
+      //   var params = {
+      //       deleteFeatures: [attributesFeature]
+      //   };
+      //   this.applyEditsProject(featureLayer, params);
+      // })
+      // );
+      
       //this.grid.store.setData([]);
       //this.grid.refresh();
     },
@@ -251,42 +255,34 @@ define([
         query.where = "1=1";
         queryTask.execute(query).then(function(featureSet) {
           if (featureSet.features.length > 0) {
-            var dataFlightPlans = array.map(featureSet.features, function(
-              flightPlan
+            var dataProjects = array.map(featureSet.features, function(
+              project
             ) {
-              // var projectType = featureSet.fields
-              //   .find(element => element.name == "type")
-              //   .hasOwnProperty("domain")
-              //   ? featureSet.fields
-              //       .find(element => element.name == "type")
-              //       .domain.codedValues.find(
-              //         element =>
-              //           element.code == flightPlan.attributes.type
-              //       ).name
-              //     : flightPlan.attributes.type;
               var projectType;
-              if (flightPlan.attributes.type != "") {
+              if (project.attributes.type != "") {
                 projectType = featureSet.fields
                   .find(element => element.name == "type")
                   .hasOwnProperty("domain")
                   ? featureSet.fields
                       .find(element => element.name == "type")
                       .domain.codedValues.find(
-                        element => element.code == flightPlan.attributes.type
+                        element => element.code == project.attributes.type
                       ).name
-                  : flightPlan.attributes.type;
+                  : project.attributes.type;
               }
               return {
                 // property names used here match those used when creating the dgrid
-                btnEdit: flightPlan.attributes.ID_PROJECT,
-                IdFlightOrder: flightPlan.attributes.ID_PROJECT,
+                btnEdit: project.attributes.ID_PROJECT,
+                btnDelete: project.attributes.OBJECTID,
+                OBJECTID: project.attributes.OBJECTID,
+                IdProject: project.attributes.ID_PROJECT,
                 ProjectType: projectType,
-                ProjectValue: flightPlan.attributes.proj_value,
-                ExecuteEntity: flightPlan.attributes.execute_ent,
-                FinancialEntity: flightPlan.attributes.financial_ent
+                ProjectValue: project.attributes.proj_value,
+                ExecuteEntity: project.attributes.execute_ent,
+                FinancialEntity: project.attributes.financial_ent
               };
             });
-            widgetAdminProjects.gridProjects.store.setData(dataFlightPlans);
+            widgetAdminProjects.gridProjects.store.setData(dataProjects);
             widgetAdminProjects.gridProjects.refresh();
           } else {
             console.log("No se encontraron registros de planes de vuelos!");
@@ -355,7 +351,7 @@ define([
       var zBtn =
         "<div style='vertical-align:middle; text-align:center; padding:0px' data-dojo-type='dijit/form/Button'><img src='" +
         window.path +
-        "/widgets/FlightPlan/images/iconEdit.png' alt='" +
+        "/widgets/ProjectAdmin/images/iconEdit.png' alt='" +
         id +
         "'";
       zBtn = zBtn + " width='16' height='16'></div>";
@@ -366,17 +362,15 @@ define([
       var zBtn =
         "<div style='vertical-align:middle; text-align:center; padding:0px' data-dojo-type='dijit/form/Button'><img src='" +
         window.path +
-        "/widgets/FlightPlan/images/iconDelete.png' alt='" +
+        "/widgets/ProjectAdmin/images/iconDelete.png' alt='" +
         id +
         "'";
       zBtn = zBtn + " width='16' height='16'></div>";
       return zBtn;
     },
 
-    loadProjectTypes: function() {
-      //debugger;
-      var arrayCboAircrafts = new Array();
-      // debugger;
+    loadSelectProjectTypes: function() {
+      var arrayToMemory = new Array();
       queryTask = new QueryTask(widgetAdminProjects.config.urlProjectsService);
       var query = new Query();
       query = new esri.tasks.Query();
@@ -384,7 +378,6 @@ define([
       query.outFields = ["*"];
       query.where = "1=1";
       // query.orderByFields = ["MATRICULA"];
-      //arrayCboAircrafts.push({ value: "-1", name: "-Seleccione el vuelo-" });
       queryTask.execute(query).then(function(featureSet) {
         if (
           featureSet.fields.find(element => element.name == "type").domain
@@ -394,24 +387,42 @@ define([
             featureSet.fields.find(element => element.name == "type").domain
               .codedValues,
             dojo.hitch(this, function(feature) {
-              arrayCboAircrafts.push({
+              arrayToMemory.push({
                 value: feature.code,
                 name: feature.name
               });
             })
           );
         }
-        widgetAdminProjects.storeAircrafts = new Memory({
-          data: arrayCboAircrafts
+        widgetAdminProjects.projectTypes = new Memory({
+          data: arrayToMemory
         });
 
+        //Lista para filtro de búsquedas de proyectos
+        widgetAdminProjects.projectTypeSelectSearch = new FilteringSelect(
+          {
+            id: "projectTypeSelectSearch",
+            name: "projectTypeSelectSearch",
+            value: "",
+            required: false,
+            store: widgetAdminProjects.projectTypes,
+            searchAttr: "name",
+            style: "width:auto"
+          },
+          "projectTypeSelectSearch"
+        ).startup();
+        projectTypeSelectSearch.defaultValue = "Seleccione una opción";
+
+        //Lista de creación edicion de proyectos
         widgetAdminProjects.projectTypeSelect = new FilteringSelect(
           {
             id: "projectTypeSelect",
-            name: "aircrafts",
-            value: "code",
-            store: widgetAdminProjects.storeAircrafts,
-            searchAttr: "name"
+            name: "projectTypeSelect",
+            value: "",
+            required: true,
+            store: widgetAdminProjects.projectTypes,
+            searchAttr: "name",
+            style: "width:auto"
           },
           "projectTypeSelect"
         ).startup();
@@ -419,11 +430,13 @@ define([
       });
     },
 
-    loadEnfoque: function() {
+    loadSelectApproaches: function() {
       //debugger;
-      var arrayCboAircrafts = new Array();
+      var arrayToMemory = new Array();
       // debugger;
-      queryTask = new QueryTask(widgetAdminProjects.config.urlProjectsService);
+      queryTask = new QueryTask(
+        widgetAdminProjects.config.urlApproachStrategiesService
+      );
       var query = new Query();
       query = new esri.tasks.Query();
       query.returnGeometry = false;
@@ -431,65 +444,151 @@ define([
       query.returnDistinctValues = true;
       query.where = "1=1";
       queryTask.execute(query).then(function(featureSet) {
-        if (
-          featureSet.fields.find(element => element.name == "type").domain
-            .codedValues.length > 0
-        ) {
+        if (featureSet.features.length > 0) {
           dojo.forEach(
-            featureSet.fields.find(element => element.name == "type").domain
-              .codedValues,
+            featureSet.features,
             dojo.hitch(this, function(feature) {
-              arrayCboAircrafts.push({
-                value: feature.code,
-                name: feature.name
+              arrayToMemory.push({
+                value: feature.attributes.Enfoque,
+                name: feature.attributes.Enfoque
               });
             })
           );
         }
-        widgetAdminProjects.storeAircrafts = new Memory({
-          data: arrayCboAircrafts
+        widgetAdminProjects.storeSelectApproach = new Memory({
+          data: arrayToMemory
         });
 
-        widgetAdminProjects.projectTypeSelect = new FilteringSelect(
+        var filteringSelect = new FilteringSelect(
           {
-            id: "projectTypeSelect",
-            name: "aircrafts",
-            value: "code",
-            store: widgetAdminProjects.storeAircrafts,
-            searchAttr: "name"
+            id: "approachesSelect",
+            // onChange: function (value)
+            // {
+            //     console.log("project Id: ", this.get("value"))
+            //     loadSelectStrategies(value,satpcontext);
+            // },
+            name: "approachesSelect",
+            value: "Enfoque",
+            store: widgetAdminProjects.storeSelectApproach,
+            searchAttr: "name",
+            required: true,
+            intermediateChanges: true,
+            onChange: lang.hitch(this, function(approachesSelect) {
+              console.log("project Id: ", this.get("value"));
+              this.loadSelectStrategies(approachesSelect);
+              // dijit.byId('strategySelect').query.state = this.item.approachesSelect || /.*/;
+              // dijit.byId('strategySelect').query.state = this.item.approachesSelect || /.*/;
+            })
           },
-          "projectTypeSelect"
-        ).startup();
-        aircraftsSelect.defaultValue = "Seleccione una opción";
+          "approachesSelect"
+        ); //.startup();
+        filteringSelect.startup();
+        filteringSelect.watch(
+          "displayedValue",
+          lang.hitch(
+            this,
+            this.approachesSelectHandler,
+            this.approachesSelect.value
+          )
+        );
+        //     .on(widgetAdminProjects.approachesSelect, 'change', function (value) {
+        //     console.log(value);
+        //   });
+        // dojo.connect(widgetAdminProjects.approachesSelect, 'onChange', function(value){console.log(value)});
+        approachesSelect.defaultValue = "Seleccione una opción";
       });
     },
 
-    selectFlighPlan: function(e) {
+    approachesSelectHandler: function(who, property, oldValue, newValue) {
+      console.info(who, property, oldValue, newValue);
+    },
+
+    loadSelectStrategies: function(approach) {
+      debugger;
+      var arrayToMemory = new Array();
+      // debugger;
+      queryTask = new QueryTask(
+        widgetAdminProjects.config.urlApproachStrategiesService
+      );
+      var query = new Query();
+      query = new esri.tasks.Query();
+      query.returnGeometry = false;
+      query.outFields = ["Enfoque"];
+      query.returnDistinctValues = true;
+      query.where = "Enfoque='" + approach + "'";
+      queryTask.execute(query).then(function(featureSet) {
+        if (featureSet.features.length > 0) {
+          dojo.forEach(
+            featureSet.features,
+            dojo.hitch(this, function(feature) {
+              arrayToMemory.push({
+                value: feature.attributes.ID_ENF_ESTG,
+                name: feature.attributes.Estrategias
+              });
+            })
+          );
+        }
+        widgetAdminProjects.storeSelectApproach = new Memory({
+          data: arrayToMemory
+        });
+
+        widgetAdminProjects.strategySelect = new FilteringSelect(
+          {
+            id: "strategySelect",
+            name: "strategy",
+            value: "ID_ENF_ESTG",
+            store: widgetAdminProjects.storeAircrafts,
+            searchAttr: "name"
+          },
+          "strategySelect"
+        ).startup();
+        strategySelect.defaultValue = "Seleccione una opción";
+      });
+    },
+
+    selectProject: function(e) {
       //debugger;
+      var row = widgetAdminProjects.gridProjects.row(e);
+      widgetAdminProjects.gridProjects.select(row);
 
-      var row = widgetAdminProjects.gridFlightPlans.row(e);
-      widgetAdminProjects.gridFlightPlans.select(row);
-
-      widgetAdminProjects.ProjectName.setValue(row.data.ProjectType);
+      widgetAdminProjects.txtProjectName.setValue(row.data.ProjectType);
       projectTypeSelect.value = row.data.ExecuteEntity;
       //originSelect.value = row.data.From;
       //destinationSelect.value = row.data.To;
 
       widgetAdminProjects.operation = "A";
-      widgetAdminProjects.toggleDivGridCreate(false);
+      widgetAdminProjects.toggleGridProjects(false);
+      },
+    
+    deleteProject: function(e) {
+        debugger;
+            
+        var featureLayer = new FeatureLayer(
+            widgetAdminProjects.config.urlProjectsService
+        );
+        var attributesFeature = {
+            OBJECTID : e.srcElement.alt
+        }
+        var params = {
+          deletes: e.srcElement.alt
+        };
+        widgetAdminProjects.applyEditsProject(featureLayer, params);
+        
+
     },
 
     toggleGridProjects: function(showGrid) {
       var tabContainerProjectData = dojo.byId("tabContainerProjectData");
       var divGridProjects = dojo.byId("divGridProjects");
+      var divNavegacion = dojo.byId("divNavegacion");
       //var divButtonsCreateFlightPlan = dojo.byId("divButtonsCreateFlightPlan");
       if (showGrid) {
         tabContainerProjectData.style.display = "none";
-        //divButtonsCreateFlightPlan.style.display = "none";
+        divNavegacion.style.display = "none";
         divGridProjects.style.display = "inline";
       } else {
         tabContainerProjectData.style.display = "inline";
-        //divButtonsCreateFlightPlan.style.display = "block";
+        divNavegacion.style.display = "block";
         divGridProjects.style.display = "none";
       }
     },
@@ -514,9 +613,32 @@ define([
       widgetAdminProjects.toggleGridProjects(false);
     },
 
-    cancelCreateProject: function() {
-      //widgetActivityReport.cleanForm();
-      widgetAdminProjects.toggleGridProjects(true);
+    goBack: function() {
+      //debugger;
+      var tabContainer = dijit.byId("tabContainerProjectData");
+      if (tabContainer.selectedChildWidget == dijit.byId("tabDetailsProject")) {
+        widgetAdminProjects.toggleGridProjects(true);
+      } else if (
+        tabContainer.selectedChildWidget == dijit.byId("tabStrategies")
+      ) {
+        tabContainer.selectChild(dijit.byId("tabDetailsProject"));
+      } else if (
+        tabContainer.selectedChildWidget == dijit.byId("tabRestaurationAreas")
+      ) {
+        tabContainer.selectChild(dijit.byId("tabStrategies"));
+      }
+    },
+
+    goNext: function() {
+      //debugger;
+      var tabContainer = dijit.byId("tabContainerProjectData");
+      if (tabContainer.selectedChildWidget == dijit.byId("tabDetailsProject")) {
+        tabContainer.selectChild(dijit.byId("tabStrategies"));
+      } else if (
+        tabContainer.selectedChildWidget == dijit.byId("tabStrategies")
+      ) {
+        tabContainer.selectChild(dijit.byId("tabRestaurationAreas"));
+      }
     },
 
     createStrategy: function() {
@@ -529,15 +651,7 @@ define([
       widgetAdminProjects.toggleGridStrategies(true);
     },
 
-    backRestaurationAreas: function() {
-      var tabContainer = dijit.byId("tabContainerProjectData");
-      tabContainer.selectChild(dijit.byId("tabDetailsProject"));
-    },
-
-    addRestaurationAreas: function() {
-      var tabContainer = dijit.byId("tabContainerProjectData");
-      tabContainer.selectChild(dijit.byId("tabRestaurationAreas"));
-    },
+    searchProjects: function() {},
 
     getMapLayer: function(urlLayer) {
       //debugger;
@@ -605,16 +719,56 @@ define([
       }
     },
 
-    applyEditProject: function() {
+    getNextObjectID: function getNextObjectID(layerObject, field) {
       debugger;
+      var def = new Deferred();
+      var query = new Query();
+      query.where = "1=1";
+      if (layerObject.url === "") {
+        def.resolve(null);
+      }
+      var statDef = new StatisticDefinition();
+      statDef.statisticType = "max";
+      statDef.onStatisticField = field;
+      statDef.outStatisticFieldName = "MAX_" + field;
 
-      var aircraftsSelect = dijit.byId("aircraftsSelect").item.value;
+      query.returnGeometry = false;
+      query.outStatistics = [statDef];
+      // console.info(this.uri);
+      var queryTask = new QueryTask(layerObject.url);
+      queryTask.execute(
+        query,
+        lang.hitch(this, function(respond) {
+          if (respond && respond.features.length > 0) {
+            if (
+              typeof respond.features[0].attributes[
+                statDef.outStatisticFieldName
+              ] === "number"
+            ) {
+              def.resolve(
+                respond.features[0].attributes[statDef.outStatisticFieldName] +
+                  1
+              );
+            }
+          } else {
+            def.resolve(1);
+          }
+          def.resolve(null);
+        }),
+        lang.hitch(this, function(err) {
+          def.resolve(null);
+        })
+      );
+      return def;
+    },
 
-      var txtEstablishmentDate = new Date(this.txtEstablishmentDate.value);
-
+    saveProject: function() {
+      //debugger;
+      var f = dojo.byId("frmMissionPlanning");
+      var _projectTypeSelect = dijit.byId("projectTypeSelect").item.value;
       var attributesFeature = {};
-      attributesFeature.name = this.txtFlightPlanName.value;
-      attributesFeature.type = this.aircraftsSelect.value;
+      attributesFeature.name = this.txtProjectName.value;
+      attributesFeature.type = dijit.byId("projectTypeSelect").item.value;
       attributesFeature.financial_ent = this.txtFinancialEntity.value;
       attributesFeature.execute_ent = this.txtExecuteEntity.value;
       attributesFeature.establishment = new Date(
@@ -625,45 +779,118 @@ define([
       attributesFeature.comment = this.txtComment.value;
       attributesFeature.budget_code = this.txtBudgetCode.value;
 
-      // var featureLayer = new FeatureLayer(
-      //   "https://services6.arcgis.com/hxAwRYAu9QHliJ8T/arcgis/rest/services/GBD_RESTAURACION/FeatureServer/2"
-      // );
       var featureLayer = new FeatureLayer(
         widgetAdminProjects.config.urlProjectsService
       );
-      this.getNextObjectID(featureLayer, "ID_PROJECT").then(
-        lang.hitch(this, function(nextID) {
-          debugger;
-          console.log("nextID:" + nextID);
-          attributesFeature.ID_PROJECT = nextID;
-          var params = {
+      var params = {};
+      if (widgetAdminProjects.operation == "A") {
+        this.getNextObjectID(featureLayer, "ID_PROJECT").then(
+          lang.hitch(this, function(nextID) {
+            debugger;
+            console.log("nextID:" + nextID);
+            attributesFeature.ID_PROJECT = nextID;
+            params = {
+              addFeatures: [attributesFeature]
+            };
+            this.applyEditsProject(featureLayer, params);
+            params = {};
+            return;
+          })
+        );
+      } else if (widgetAdminProjects.operation == "U") {
+        params = {
+          updateFeatures: [attributesFeature]
+        };
+      } else if (widgetAdminProjects.operation == "D") {
+        params = {
+          deleteFeatures: [attributesFeature]
+        };
+      }
+      this.applyEditsProject(featureLayer, params);
+      },
+    
+      addStrategy: function (ID_PROJECT) {
+        debugger;
+
+        var aircraftsSelect = dijit.byId("aircraftsSelect").item.value;
+
+        var txtEstablishmentDate = new Date(this.txtEstablishmentDate.value);
+
+        var attributesFeature = {};
+        attributesFeature.name = this.txtFlightPlanName.value;
+        attributesFeature.type = this.aircraftsSelect.value;
+        attributesFeature.financial_ent = this.txtFinancialEntity.value;
+        attributesFeature.execute_ent = this.txtExecuteEntity.value;
+        attributesFeature.establishment = new Date(
+            this.txtEstablishmentDate.value
+        );
+        attributesFeature.lead_time = parseInt(this.txtLeadTime.value);
+        attributesFeature.proj_value = parseFloat(this.txtProjectValue.value);
+        attributesFeature.comment = this.txtComment.value;
+        attributesFeature.budget_code = this.txtBudgetCode.value;
+
+        var featureLayer = new FeatureLayer(
+            widgetAdminProjects.config.urlProjetStrategiesService
+        );
+        debugger;
+        console.log("ID_PROJECT:" + ID_PROJECT);
+        attributesFeature.ID_PROJECT = ID_PROJECT;
+        var params = {
             attributes: attributesFeature
-          };
-          featureLayer
+        };
+        featureLayer
             .applyEdits([params])
-            .then(function(editsResult) {
-              debugger;
-              if (editsResult.addResults[0].success) {
-                const objectId = editsResult.addResults[0].objectId;
-                dom.byId("divResult").innerHTML =
-                  "Registro creado satisfactoriamente";
-                // selectFeature(objectId);
-                this.applyEditStrategies(nextID);
-                this.applyEditSpecies(nextID);
-              }
+            .then(function (editsResult) {
+                debugger;
+                if (editsResult.addResults[0].success) {
+                    const objectId = editsResult.addResults[0].objectId;
+                    dom.byId("divResult").innerHTML =
+                        "Registro creado satisfactoriamente";
+                    // selectFeature(objectId);
+                }
             })
-            .catch(function(error) {
-              console.log("===============================================");
-              console.error(
-                "[ applyEdits ] FAILURE: ",
-                error.code,
-                error.name,
-                error.message
-              );
-              console.log("error = ", error);
+            .catch(function (error) {
+                console.log("===============================================");
+                console.error(
+                    "[ applyEdits ] FAILURE: ",
+                    error.code,
+                    error.name,
+                    error.message
+                );
+                console.log("error = ", error);
             });
+    },
+    
+
+    applyEditsProject: function(featureLayer, params) {
+      debugger;
+      featureLayer
+        .applyEdits(params)
+        .then(function(editsResult) {
+          debugger;
+          if (editsResult.addFeatureResults.length > 0) {
+            dom.byId("divResult").innerHTML =
+              widgetAdminProjects.nls.CreateRecord;
+            this.saveEditStrategies(params.attributes.ID_PROJECT);
+            this.saveEditSpecies(params.attributes.ID_PROJECT);
+          } else if (editsResult.updateFeatureResults.length > 0) {
+            dom.byId("divResult").innerHTML =
+              widgetAdminProjects.nls.UpdateRecord;
+          } else if (editsResult.deleteResults.length > 0) {
+            this.saveEditStrategies(params.attributes.ID_PROJECT);
+            // this.saveEditSpecies(params.attributes.ID_PROJECT);
+          }
         })
-      );
+        .catch(function(error) {
+          console.log("===============================================");
+          console.error(
+            "[ applyEdits ] FAILURE: ",
+            error.code,
+            error.name,
+            error.message
+          );
+          console.log("error = ", error);
+        });
     },
 
     applyEditStrategies: function(ID_PROJECT) {
@@ -717,6 +944,7 @@ define([
           console.log("error = ", error);
         });
     },
+
     applyEditSpecies: function(ID_PROJECT) {
       debugger;
 

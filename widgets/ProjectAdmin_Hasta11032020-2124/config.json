@@ -1,9 +1,0 @@
-{
-  "configText": "abcdefg",
-  "urlAreasRestauracion":"https://services6.arcgis.com/hxAwRYAu9QHliJ8T/arcgis/rest/services/GBD_RESTAURACION/FeatureServer/1",
-  "urlProjectsService": "https://services6.arcgis.com/hxAwRYAu9QHliJ8T/arcgis/rest/services/GBD_RESTAURACION/FeatureServer/2",  
-  "urlCategoriaSpeciesService": "https://services6.arcgis.com/hxAwRYAu9QHliJ8T/arcgis/rest/services/GDB_RESTAURACION/FeatureServer/3",
-  "urlProyectoSpeciesService":"https://services6.arcgis.com/hxAwRYAu9QHliJ8T/arcgis/rest/services/GBD_RESTAURACION/FeatureServer/4",
-  "urlEnfoqueEstrategiaService":"https://services6.arcgis.com/hxAwRYAu9QHliJ8T/arcgis/rest/services/GBD_RESTAURACION/FeatureServer/5",
-  "urlProjetStrategiesService": "https://services6.arcgis.com/hxAwRYAu9QHliJ8T/arcgis/rest/services/GBD_RESTAURACION/FeatureServer/6"
-}

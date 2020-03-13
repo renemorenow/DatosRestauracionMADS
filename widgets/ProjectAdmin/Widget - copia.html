@@ -59,8 +59,7 @@
                                 <label for="lblProjectName">${nls.ProjectName}:</label><span class="atiRequiredField"> *</span>
                             </td>
                             <td>
-                                <input data-dojo-attach-point="hiddenProjectId" name="hiddenProjectId" type="hidden" />
-                                <input data-dojo-attach-point="txtProjectName" name="txtProjectName" data-dojo-type="dijit/form/TextBox" required="true" maxLength="100" placeholder="${nls.ProjectName}" />
+                                <input data-dojo-attach-point="txtProjectName" name="txtProjectName" data-dojo-type="dijit/form/TextBox" required="true" maxLength="100" placeholder="${nls.ProjectName}"/>
                             </td>
                         </tr>
                         <tr>
@@ -76,7 +75,7 @@
                                 <label for="lblFinancialEntity">${nls.FinancialEntity}:</label>
                             </td>
                             <td>
-                                <input data-dojo-attach-point="txtFinancialEntity" name="txtFinancialEntity" data-dojo-type="dijit/form/TextBox" maxLength="100" placeholder="${nls.FinancialEntity}" />
+                                <input data-dojo-attach-point="txtFinancialEntity" name="txtFinancialEntity" data-dojo-type="dijit/form/TextBox" maxLength="100" placeholder="${nls.FinancialEntity}"/>
                             </td>
                         </tr>
                         <tr>
@@ -203,7 +202,7 @@
                                 <label for="lblArea">${nls.Area}:</label><span class="atiRequiredField"> *</span>
                             </td>
                             <td>
-                                <input id="txtArea" type="text" data-dojo-type="dijit/form/NumberTextBox" name="txtArea" required="true" data-dojo-props="constraints:{min:0,max:20000,places:'0,3'}, invalidMessage:'Ingrese un valor numérico!', rangeMessage:'Valor fuera de rango!'" />
+                                <input data-dojo-attach-point="txtArea" name="txtArea" data-dojo-type="dijit/form/TextBox" maxLength="9" type="number" pattern="[0-9.]*" />
                             </td>
                         </tr>
                         <tr>
@@ -211,16 +210,17 @@
                                 <div class="ButtonAddRecord" data-dojo-attach-point="btnCancelAddStrategy" role="button" tabindex="0" data-dojo-attach-event="click:cancelCreateStrategy" aria-label="Cancelar">
                                     <table>
                                         <tr>
-                                            <td style="width:25px" valign="middle"><img src="/MADS/widgets/ProjectAdmin/images/Cancel.png" width="20" height="20" /></td>
-                                            <td valign="middle">${nls.Cancel}</td>
+                                            <td style="width:25px"><img src="/MADS/widgets/ProjectAdmin/images/Cancel.png" width="20" height="20" /></td>
+                                            <td>${nls.Cancel}</td>
+
                                         </tr>
                                     </table>
                                 </div>&nbsp;&nbsp;&nbsp;
                                 <div class="ButtonAddRecord" data-dojo-attach-point="btnAddStrategy" role="button" tabindex="0" data-dojo-attach-event="click:addStrategy" aria-label="Agregar Estrategia">
                                     <table>
                                         <tr>
-                                            <td style="width:25px" valign="middle"><img src="/MADS/widgets/ProjectAdmin/images/OK.png" width="20" height="20" /></td>
-                                            <td valign="middle">${nls.Save}</td>
+                                            <td style="width:25px"><img src="/MADS/widgets/ProjectAdmin/images/OK.png" width="20" height="20" /></td>
+                                            <td>${nls.Save}</td>
                                         </tr>
                                     </table>
                                 </div>
